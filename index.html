@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cable — Your Cable Inventory</title>
+  <meta name="description" content="Cable is a sleek PWA to catalogue every cable, adapter, and accessory you own. Smart search, connector pairing, and offline support." />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cable" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ====== Header ====== -->
+  <header class="header" id="header">
+    <div class="header__brand">
+      <div class="header__logo" aria-hidden="true">🔌</div>
+      <h1 class="header__title">Cable</h1>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-wrap__icon" aria-hidden="true">🔍</span>
+      <input
+        type="search"
+        id="search-input"
+        class="search-wrap__input"
+        placeholder="Search… try &quot;charge iPhone&quot; or &quot;audio from laptop&quot;"
+        autocomplete="off"
+      />
+      <span class="search-wrap__hint">⌘K</span>
+    </div>
+
+    <div class="header__actions">
+      <div class="dropdown" id="more-dropdown">
+        <button class="btn-skeuo btn-skeuo--icon" id="more-btn" aria-label="More options" title="More">⋮</button>
+        <div class="dropdown__menu" id="more-menu">
+          <button class="dropdown__item" id="export-btn">📤 Export JSON</button>
+          <button class="dropdown__item" id="import-btn">📥 Import JSON</button>
+        </div>
+      </div>
+      <input type="file" id="import-file" accept=".json" class="sr-only" />
+    </div>
+  </header>
+
+  <!-- ====== Main ====== -->
+  <main class="main" id="main">
+
+    <!-- View tabs -->
+    <div class="view-tabs" id="view-tabs">
+      <button class="view-tab view-tab--active" data-view="inventory">📦 Inventory</button>
+      <button class="view-tab" data-view="pairing">🔗 Pairing</button>
+    </div>
+
+    <!-- Stats -->
+    <section class="stats-row" id="stats-row" aria-label="Statistics">
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--items">📦</div>
+        <div>
+          <div class="stat-card__value" id="stat-items">0</div>
+          <div class="stat-card__label">Total Items</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--categories">📁</div>
+        <div>
+          <div class="stat-card__value" id="stat-categories">0</div>
+          <div class="stat-card__label">Categories</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--connectors">🔌</div>
+        <div>
+          <div class="stat-card__value" id="stat-connectors">0</div>
+          <div class="stat-card__label">Connector Types</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--pairings">🔗</div>
+        <div>
+          <div class="stat-card__value" id="stat-pairings">0</div>
+          <div class="stat-card__label">Possible Pairings</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INVENTORY VIEW ===== -->
+    <section class="inventory-section" id="inventory-section">
+
+      <!-- Search result hint -->
+      <div class="search-hint" id="search-hint" style="display:none">
+        <span class="search-hint__icon">💡</span>
+        <span id="search-hint-text"></span>
+        <span class="search-hint__clear" id="search-clear">✕ Clear</span>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar" id="toolbar">
+        <div class="toolbar__left">
+          <h2 class="toolbar__heading">My Inventory</h2>
+          <button class="chip chip--active" data-filter="all">All</button>
+          <button class="chip" data-filter="cables">Cables</button>
+          <button class="chip" data-filter="adapters">Adapters</button>
+          <button class="chip" data-filter="audio">Audio</button>
+          <button class="chip" data-filter="storage">Storage</button>
+          <button class="chip" data-filter="power">Power</button>
+        </div>
+        <div class="toolbar__right">
+          <select class="sort-select" id="sort-select" aria-label="Sort items">
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+            <option value="qty-desc">Qty ↓</option>
+            <option value="qty-asc">Qty ↑</option>
+            <option value="newest">Newest</option>
+          </select>
+          <button class="btn-skeuo btn-skeuo--primary" id="add-item-btn">
+            <span aria-hidden="true">＋</span> Add Cable
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="item-grid" id="item-grid"></div>
+
+      <!-- Empty -->
+      <div class="empty-state" id="empty-state" style="display:none">
+        <div class="empty-state__icon">🔌</div>
+        <h3 class="empty-state__title">No cables yet</h3>
+        <p class="empty-state__desc">Start cataloguing your cables and gear — tap below to add your first cable.</p>
+        <button class="btn-skeuo btn-skeuo--primary" id="empty-add-btn">＋ Add Cable</button>
+      </div>
+    </section>
+
+    <!-- ===== PAIRING VIEW ===== -->
+    <section class="pairing-section" id="pairing-section">
+      <div class="pairing-layout">
+        <div class="pairing-left" id="pairing-left">
+          <div class="pairing-left__title">Select a connector</div>
+          <!-- Connector tiles injected by JS -->
+        </div>
+        <div class="pairing-right" id="pairing-right">
+          <div class="pairing-empty" id="pairing-placeholder">
+            <div class="pairing-empty__icon">🔗</div>
+            <h3 class="pairing-empty__title">Choose a connector</h3>
+            <p class="pairing-empty__desc">Select a connector type on the left to see everything in your inventory that can pair with it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" aria-label="Add cable">＋</button>
+
+  <!-- ====== Add/Edit Modal ====== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" role="dialog" aria-labelledby="modal-title">
+      <div class="modal__header">
+        <h2 class="modal__title" id="modal-title">Add Cable</h2>
+        <button class="modal__close" id="modal-close" aria-label="Close">✕</button>
+      </div>
+      <form id="item-form" autocomplete="off">
+        <div class="modal__body">
+          <div class="form-group">
+            <label class="form-label" for="f-name">Name <span>*</span></label>
+            <input class="form-input" id="f-name" type="text" placeholder="e.g. USB to Lightning Cable" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-category">Category <span>*</span></label>
+              <select class="form-select" id="f-category" required>
+                <option value="">Select…</option>
+                <option value="cables">Cables</option>
+                <option value="adapters">Adapters</option>
+                <option value="audio">Audio</option>
+                <option value="storage">Storage</option>
+                <option value="power">Power</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="f-qty">Quantity</label>
+              <input class="form-input" id="f-qty" type="number" min="1" value="1" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-conn-a">Connector A</label>
+              <select class="form-select" id="f-conn-a">
+                <option value="">None</option>
+                <option value="usb-a">USB-A</option>
+                <option value="usb-c">USB-C / Type C</option>
+                <option value="lightning">Lightning</option>
+                <option value="micro-usb">Micro USB</option>
+                <option value="hdmi">HDMI</option>
+                <option value="3.5mm">3.5mm Audio Jack</option>
+                <option value="magsafe">MagSafe</option>
+                <option value="bluetooth">Bluetooth</option>
+                <option value="wall-plug">Wall Plug</option>
+                <option value="proprietary">Proprietary</option>
+                <option value="aaa">AAA Battery</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="f-conn-b">Connector B</label>
+              <select class="form-select" id="f-conn-b">
+                <option value="">None</option>
+                <option value="usb-a">USB-A</option>
+                <option value="usb-c">USB-C / Type C</option>
+                <option value="lightning">Lightning</option>
+                <option value="micro-usb">Micro USB</option>
+                <option value="hdmi">HDMI</option>
+                <option value="3.5mm">3.5mm Audio Jack</option>
+                <option value="magsafe">MagSafe</option>
+                <option value="bluetooth">Bluetooth</option>
+                <option value="wall-plug">Wall Plug</option>
+                <option value="proprietary">Proprietary</option>
+                <option value="aaa">AAA Battery</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-notes">Notes</label>
+            <textarea class="form-textarea" id="f-notes" placeholder="Any extra details…" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn-skeuo" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn-skeuo btn-skeuo--primary" id="modal-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== Confirm dialog ====== -->
+  <div class="modal-overlay" id="confirm-overlay">
+    <div class="modal confirm-dialog" role="alertdialog" aria-labelledby="confirm-title">
+      <div class="confirm-dialog__icon">🗑️</div>
+      <h3 class="confirm-dialog__title" id="confirm-title">Delete Cable?</h3>
+      <p class="confirm-dialog__desc" id="confirm-desc">This cable will be permanently removed.</p>
+      <div class="confirm-dialog__actions">
+        <button class="btn-skeuo" id="confirm-cancel">Cancel</button>
+        <button class="btn-skeuo btn-skeuo--danger" id="confirm-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer__text">
+      Made with <span class="footer__heart">❤️</span> by Spandan and <img src="claude.png" alt="Claude" class="footer__claude-logo" />
+    </p>
+  </footer>
+
+  <!-- Toasts -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
