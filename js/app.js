@@ -9,17 +9,17 @@
      CONNECTOR METADATA
      ------------------------------------------------------- */
   const CONNECTORS = {
-    'usb-a':       { label: 'USB-A',        icon: '▬',  color: '#4fc3f7' },
-    'usb-c':       { label: 'USB-C',        icon: '⬭',  color: '#7c4dff' },
-    'lightning':   { label: 'Lightning',    icon: '⚡', color: '#e0e0e0' },
-    'micro-usb':   { label: 'Micro USB',    icon: '▭',  color: '#66bb6a' },
-    'hdmi':        { label: 'HDMI',         icon: '▰',  color: '#ef5350' },
-    '3.5mm':       { label: '3.5mm Jack',   icon: '◉',  color: '#ffa726' },
-    'magsafe':     { label: 'MagSafe',      icon: '◎',  color: '#e0e0e0' },
-    'bluetooth':   { label: 'Bluetooth',    icon: '᛫',  color: '#42a5f5' },
-    'wall-plug':   { label: 'Wall Plug',    icon: '⏚',  color: '#ffd54f' },
-    'proprietary': { label: 'Proprietary',  icon: '✦',  color: '#bdbdbd' },
-    'aaa':         { label: 'AAA Battery',  icon: '🔋', color: '#ffd54f' },
+    'usb-a':       { label: 'USB-A',        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5"/><path d="M14 2v7.5"/><path d="M12 14v8"/><rect x="8" y="2" width="8" height="12" rx="1"/></svg>',  color: '#4fc3f7' },
+    'usb-c':       { label: 'USB-C',        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="6"/><path d="M12 4v16"/></svg>',  color: '#7c4dff' },
+    'lightning':   { label: 'Lightning',    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v8"/><path d="M14 2v8"/><rect x="8" y="10" width="8" height="12" rx="2"/><path d="M12 22v2"/></svg>', color: '#e0e0e0' },
+    'micro-usb':   { label: 'Micro USB',    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4l-2-2H8l-2 2Z"/><path d="M12 16v6"/></svg>',  color: '#66bb6a' },
+    'hdmi':        { label: 'HDMI',         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8v6l3 3h8l3-3V8a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2Z"/><path d="M9 17v5"/><path d="M15 17v5"/></svg>',  color: '#ef5350' },
+    '3.5mm':       { label: '3.5mm Jack',   icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 16v6"/></svg>',  color: '#ffa726' },
+    'magsafe':     { label: 'MagSafe',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M4 12h16"/><path d="M12 6v12"/></svg>',  color: '#e0e0e0' },
+    'bluetooth':   { label: 'Bluetooth',    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10-5 5V2l5 5-10 10"/></svg>',  color: '#42a5f5' },
+    'wall-plug':   { label: 'Wall Plug',    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="12" height="8" rx="1"/><path d="M9 2v6"/><path d="M15 2v6"/><path d="M12 16v6"/></svg>',  color: '#ffd54f' },
+    'proprietary': { label: 'Proprietary',  icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',  color: '#bdbdbd' },
+    'aaa':         { label: 'AAA Battery',  icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M10 2h4"/><path d="M12 10v4"/><path d="M10 12h4"/></svg>', color: '#ffd54f' },
   };
 
   const CATEGORIES = {
@@ -176,8 +176,9 @@
   let activeSort = 'name-asc';
   let searchQuery = '';
   let searchHint = '';
-  let activeView = 'inventory';
-  let selectedConnector = null;
+  let activeView = 'pairing';
+  let slot1Connector = null;
+  let slot2Connector = null;
 
   /* -------------------------------------------------------
      DOM
@@ -200,9 +201,15 @@
     viewTabs:       $('#view-tabs'),
     inventorySection: $('#inventory-section'),
     pairingSection: $('#pairing-section'),
-    pairingLeft:    $('#pairing-left'),
-    pairingRight:   $('#pairing-right'),
+    pairingCanvas:  $('.pairing-canvas'),
+    pairingDockScroll: $('#pairing-dock-scroll'),
+    pairingResults: $('#pairing-results'),
     pairingPlaceholder: $('#pairing-placeholder'),
+    slot1:          $('#slot-1'),
+    slot2:          $('#slot-2'),
+    slot1Remove:    $('#slot-1-remove'),
+    slot2Remove:    $('#slot-2-remove'),
+    pairingClear:   $('#pairing-clear-btn'),
     // Modal
     modalOverlay:   $('#modal-overlay'),
     modalTitle:     $('#modal-title'),
@@ -484,15 +491,26 @@
     return [...set].sort((a, b) => (CONNECTORS[a]?.label || a).localeCompare(CONNECTORS[b]?.label || b));
   }
 
-  function getPairingResults(connectorId) {
-    return items.filter(it => it.connA === connectorId || it.connB === connectorId).map(it => {
-      const otherConns = [];
-      if (it.connA && it.connA !== connectorId) otherConns.push(it.connA);
-      if (it.connB && it.connB !== connectorId) otherConns.push(it.connB);
-      // If both connectors are the same (e.g., aux 3.5mm↔3.5mm), show it
-      if (it.connA === connectorId && it.connB === connectorId) otherConns.push(connectorId);
-      return { item: it, bridgesTo: otherConns };
-    });
+  function getPairingResultsDual(conn1, conn2) {
+    if (conn1 && !conn2) {
+      return items.filter(it => it.connA === conn1 || it.connB === conn1).map(it => {
+        const otherConns = [];
+        if (it.connA && it.connA !== conn1) otherConns.push(it.connA);
+        if (it.connB && it.connB !== conn1) otherConns.push(it.connB);
+        if (it.connA === conn1 && it.connB === conn1) otherConns.push(conn1);
+        return { item: it, bridgesTo: otherConns };
+      });
+    } else if (conn1 && conn2) {
+      return items.filter(it => {
+        const c1 = it.connA;
+        const c2 = it.connB;
+        if (!c1 || !c2) return false;
+        return (c1 === conn1 && c2 === conn2) || (c1 === conn2 && c2 === conn1);
+      }).map(it => {
+        return { item: it, bridgesTo: [conn2] };
+      });
+    }
+    return [];
   }
 
   function countPossiblePairings() {
@@ -572,6 +590,9 @@
      RENDER — INVENTORY
      ------------------------------------------------------- */
   function render() {
+    dom.inventorySection.classList.toggle('inventory-section--hidden', activeView !== 'inventory');
+    dom.pairingSection.classList.toggle('pairing-section--active', activeView === 'pairing');
+    
     if (activeView === 'inventory') renderInventory();
     else renderPairing();
     updateStats();
@@ -653,52 +674,119 @@
   /* -------------------------------------------------------
      RENDER — PAIRING
      ------------------------------------------------------- */
+  /* -------------------------------------------------------
+     RENDER — PAIRING (Drag & Drop)
+     ------------------------------------------------------- */
   function renderPairing() {
-    // Build connector tiles
+    // Render Dock
     const connectors = getAllConnectorsFromInventory();
-    const title = dom.pairingLeft.querySelector('.pairing-left__title');
-    dom.pairingLeft.innerHTML = '';
-    dom.pairingLeft.appendChild(title || (() => { const d = document.createElement('div'); d.className = 'pairing-left__title'; d.textContent = 'Select a connector'; return d; })());
-
+    dom.pairingDockScroll.innerHTML = '';
+    
     connectors.forEach(connId => {
       const meta = CONNECTORS[connId];
       if (!meta) return;
       const count = items.filter(it => it.connA === connId || it.connB === connId).length;
-      const tile = document.createElement('button');
-      tile.className = 'connector-tile' + (selectedConnector === connId ? ' connector-tile--active' : '');
-      tile.dataset.connector = connId;
-      tile.innerHTML = `
-        <span class="connector-tile__icon">${meta.icon}</span>
-        <span>${meta.label}</span>
-        <span class="connector-tile__count">${count}</span>
+      
+      const el = document.createElement('div');
+      el.className = 'dock-item';
+      el.dataset.connector = connId;
+      el.draggable = true;
+      el.innerHTML = `
+        <div class="dock-item__icon">${meta.icon}</div>
+        <div class="dock-item__label">${meta.label} <span style="opacity:0.6;font-weight:400;display:block">(${count})</span></div>
       `;
-      dom.pairingLeft.appendChild(tile);
+      dom.pairingDockScroll.appendChild(el);
     });
 
-    // Render right panel
-    if (!selectedConnector) {
-      dom.pairingRight.innerHTML = '';
-      dom.pairingRight.appendChild(dom.pairingPlaceholder);
+    // Render Slots
+    function updateSlot(slotEl, connId, defaultLabel) {
+      const iconWrap = slotEl.querySelector('.pairing-slot__icon');
+      const labelEl = slotEl.querySelector('.pairing-slot__label');
+      const removeBtn = slotEl.querySelector('.pairing-slot__remove');
+      
+      if (connId && CONNECTORS[connId]) {
+        const meta = CONNECTORS[connId];
+        slotEl.classList.add('has-item');
+        iconWrap.innerHTML = meta.icon;
+        labelEl.textContent = meta.label;
+        removeBtn.style.display = 'flex';
+      } else {
+        slotEl.classList.remove('has-item');
+        iconWrap.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m9 18 3 3 3-3"/><path d="m9 6 3-3 3 3"/></svg>';
+        labelEl.textContent = defaultLabel;
+        removeBtn.style.display = 'none';
+      }
+    }
+    
+    updateSlot(dom.slot1, slot1Connector, 'Drop Port 1');
+    updateSlot(dom.slot2, slot2Connector, 'Drop Port 2');
+
+    let showSlot1 = true;
+    let showSlot2 = true;
+
+    if (slot1Connector && !slot2Connector) {
+      const matches = items.filter(it => it.connA === slot1Connector || it.connB === slot1Connector);
+      let possible = 0;
+      matches.forEach(it => {
+        if (it.connA === slot1Connector && it.connB) possible++;
+        if (it.connB === slot1Connector && it.connA) possible++;
+      });
+      if (possible === 0) showSlot2 = false;
+    } else if (slot2Connector && !slot1Connector) {
+      const matches = items.filter(it => it.connA === slot2Connector || it.connB === slot2Connector);
+      let possible = 0;
+      matches.forEach(it => {
+        if (it.connA === slot2Connector && it.connB) possible++;
+        if (it.connB === slot2Connector && it.connA) possible++;
+      });
+      if (possible === 0) showSlot1 = false;
+    }
+
+    dom.slot1.style.display = showSlot1 ? 'flex' : 'none';
+    dom.slot2.style.display = showSlot2 ? 'flex' : 'none';
+    
+    const linkIcon = dom.pairingCanvas.querySelector('.pairing-canvas__link');
+    if (linkIcon) linkIcon.style.display = (showSlot1 && showSlot2) ? 'flex' : 'none';
+
+    dom.pairingCanvas.classList.toggle('has-both', !!(slot1Connector && slot2Connector));
+    dom.pairingClear.style.display = (slot1Connector || slot2Connector) ? 'inline-flex' : 'none';
+
+    // Render Results
+    dom.pairingResults.innerHTML = '';
+    if (!slot1Connector && !slot2Connector) {
+      dom.pairingResults.appendChild(dom.pairingPlaceholder);
       dom.pairingPlaceholder.style.display = 'flex';
+      dom.pairingPlaceholder.querySelector('.pairing-empty__title').textContent = 'Ready to pair';
+      dom.pairingPlaceholder.querySelector('.pairing-empty__desc').textContent = 'Place one or two connectors onto the canvas to see your options.';
       return;
     }
 
-    const results = getPairingResults(selectedConnector);
-    const connLabel = CONNECTORS[selectedConnector]?.label || selectedConnector;
+    // Always sort so that we search conn1 to conn2. If only slot2 is filled, treat it as conn1.
+    const c1 = slot1Connector || slot2Connector;
+    const c2 = (slot1Connector && slot2Connector) ? slot2Connector : null;
+    
+    const results = getPairingResultsDual(c1, c2);
 
-    dom.pairingRight.innerHTML = `
+    let headerText = '';
+    if (c1 && c2) {
+      headerText = `Bridges ${CONNECTORS[c1].label} ↔ ${CONNECTORS[c2].label}`;
+    } else {
+      headerText = `Items with ${CONNECTORS[c1].label}`;
+    }
+
+    dom.pairingResults.innerHTML = `
       <div class="pairing-header">
-        Items with ${connLabel}
+        ${headerText}
         <span class="pairing-header__badge">${results.length}</span>
       </div>
     `;
 
     if (results.length === 0) {
-      dom.pairingRight.innerHTML += `
-        <div class="pairing-empty">
+      dom.pairingResults.innerHTML += `
+        <div class="pairing-empty" style="padding:40px 20px;">
           <div class="pairing-empty__icon">🤷</div>
-          <h3 class="pairing-empty__title">No items</h3>
-          <p class="pairing-empty__desc">No items in your inventory use ${connLabel}.</p>
+          <h3 class="pairing-empty__title">No items found</h3>
+          <p class="pairing-empty__desc">No items in your inventory match this combination.</p>
         </div>`;
       return;
     }
@@ -709,7 +797,7 @@
       if (bridgesTo.length > 0) {
         bridgeHtml = bridgesTo.map(c => {
           const m = CONNECTORS[c];
-          return m ? `<span class="pairing-result__bridge-connector">${m.icon} ${m.label}</span>` : '';
+          return m ? `<span class="pairing-result__bridge-connector" style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;display:flex;">${m.icon}</span> ${m.label}</span>` : '';
         }).filter(Boolean).join(' ');
         bridgeHtml = `<div class="pairing-result__bridge">Bridges to → ${bridgeHtml}</div>`;
       } else {
@@ -726,7 +814,7 @@
         </div>
         <div class="pairing-result__qty">×${item.qty || 1}</div>
       `;
-      dom.pairingRight.appendChild(el);
+      dom.pairingResults.appendChild(el);
     });
   }
 
@@ -933,13 +1021,125 @@
       render();
     });
 
-    // Pairing connector selection (delegated)
-    dom.pairingLeft.addEventListener('click', e => {
-      const tile = e.target.closest('.connector-tile');
-      if (!tile) return;
-      selectedConnector = tile.dataset.connector;
-      renderPairing();
+    // Drag and Drop Logic
+    let draggedConnId = null;
+
+    dom.pairingDockScroll.addEventListener('dragstart', e => {
+      const item = e.target.closest('.dock-item');
+      if (!item) return;
+      draggedConnId = item.dataset.connector;
+      e.dataTransfer.setData('text/plain', draggedConnId);
+      e.dataTransfer.effectAllowed = 'copy';
+      setTimeout(() => item.classList.add('is-dragging'), 0);
     });
+    
+    dom.pairingDockScroll.addEventListener('dragend', e => {
+      const item = e.target.closest('.dock-item');
+      if (item) item.classList.remove('is-dragging');
+      draggedConnId = null;
+      dom.slot1.classList.remove('drag-over');
+      dom.slot2.classList.remove('drag-over');
+    });
+
+    [dom.slot1, dom.slot2].forEach(slot => {
+      slot.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (draggedConnId) {
+          e.dataTransfer.dropEffect = 'copy';
+          slot.classList.add('drag-over');
+        }
+      });
+      slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+      slot.addEventListener('drop', e => {
+        e.preventDefault();
+        slot.classList.remove('drag-over');
+        const connId = e.dataTransfer.getData('text/plain');
+        if (connId) {
+          if (slot.id === 'slot-1') slot1Connector = connId;
+          if (slot.id === 'slot-2') slot2Connector = connId;
+          renderPairing();
+        }
+      });
+    });
+
+    // Custom Touch Drag & Drop Logic for Mobile
+    let touchGhost = null;
+    let touchConnId = null;
+
+    dom.pairingDockScroll.addEventListener('touchstart', e => {
+      const item = e.target.closest('.dock-item');
+      if (!item) return;
+      
+      touchConnId = item.dataset.connector;
+      const rect = item.getBoundingClientRect();
+      const touch = e.touches[0];
+
+      // Create ghost element
+      touchGhost = item.cloneNode(true);
+      touchGhost.classList.add('drag-ghost');
+      touchGhost.style.position = 'fixed';
+      touchGhost.style.left = `${rect.left}px`;
+      touchGhost.style.top = `${rect.top}px`;
+      touchGhost.style.width = `${rect.width}px`;
+      touchGhost.style.height = `${rect.height}px`;
+      touchGhost.style.pointerEvents = 'none';
+      touchGhost.style.zIndex = '9999';
+      touchGhost.style.opacity = '0.85';
+      touchGhost.style.transform = 'scale(1.05)';
+      touchGhost.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
+      document.body.appendChild(touchGhost);
+      
+      // Store offsets
+      touchGhost.dataset.offsetX = touch.clientX - rect.left;
+      touchGhost.dataset.offsetY = touch.clientY - rect.top;
+      
+      item.classList.add('is-dragging');
+      // Delay preventDefault so scroll isn't completely broken if they just tap?
+      // Actually, if we're dragging, we shouldn't preventDefault immediately unless they move.
+      // But for simplicity, we'll let touchmove handle preventDefault.
+    }, { passive: false });
+
+    document.addEventListener('touchmove', e => {
+      if (!touchGhost) return;
+      if (e.cancelable) e.preventDefault();
+      const touch = e.touches[0];
+      const offsetX = parseFloat(touchGhost.dataset.offsetX);
+      const offsetY = parseFloat(touchGhost.dataset.offsetY);
+      touchGhost.style.left = `${touch.clientX - offsetX}px`;
+      touchGhost.style.top = `${touch.clientY - offsetY}px`;
+
+      // Highlight slots
+      const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      const slot = elemBelow ? elemBelow.closest('.pairing-slot') : null;
+      
+      [dom.slot1, dom.slot2].forEach(s => s.classList.remove('drag-over'));
+      if (slot) slot.classList.add('drag-over');
+    }, { passive: false });
+
+    document.addEventListener('touchend', e => {
+      if (!touchGhost) return;
+      const touch = e.changedTouches[0];
+      const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      const slot = elemBelow ? elemBelow.closest('.pairing-slot') : null;
+      
+      if (slot && touchConnId) {
+        if (slot.id === 'slot-1') slot1Connector = touchConnId;
+        if (slot.id === 'slot-2') slot2Connector = touchConnId;
+        renderPairing();
+      }
+      
+      [dom.slot1, dom.slot2].forEach(s => s.classList.remove('drag-over'));
+      const activeItem = dom.pairingDockScroll.querySelector('.dock-item.is-dragging');
+      if (activeItem) activeItem.classList.remove('is-dragging');
+      
+      touchGhost.remove();
+      touchGhost = null;
+      touchConnId = null;
+    });
+
+    dom.slot1Remove.addEventListener('click', e => { e.stopPropagation(); slot1Connector = null; renderPairing(); });
+    dom.slot2Remove.addEventListener('click', e => { e.stopPropagation(); slot2Connector = null; renderPairing(); });
+    dom.pairingClear.addEventListener('click', () => { slot1Connector = null; slot2Connector = null; renderPairing(); });
 
     // Dropdown
     dom.moreBtn.addEventListener('click', e => { e.stopPropagation(); dom.moreMenu.classList.toggle('dropdown__menu--visible'); });
