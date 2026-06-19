@@ -110,13 +110,6 @@ Cable/
 | `Escape` | Close any open modal |
 
 ---
-
-## 📸 Screenshots
-
-> _Screenshots coming soon — or just [open the app](https://spandansaxena.github.io/Cable/) and see for yourself._
-
----
-
 <p align="center">
   Made with ❤️ by <strong>Spandan</strong> and <strong>Claude</strong>
 </p>
